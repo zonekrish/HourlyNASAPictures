@@ -4,5 +4,8 @@
 # Credentials
 secret.py
 
+# Lambda dependencies
+dependencies
+
 # pycache funsies
 __pycache__
