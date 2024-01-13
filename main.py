@@ -56,7 +56,15 @@ def tweet():
     with open("temp.jpg", "wb") as f:
         f.write(imgData)
     
-    # Create tweet
-    # client.create_tweet(text="...still love space")
+    # Set up image metadata
+    metadata = soup2.title.string
+    print(metadata.strip())
+
+    # Upload photo to Twitter
+    img = api.simple_upload("temp.jpg")
+    api.create_media_metadata(img.media_id, alt_text=metadata[7:])
+
+    post = client.create_tweet(media_ids=[img.media_id])
+
 
 tweet()
