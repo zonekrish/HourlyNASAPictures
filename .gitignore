@@ -6,6 +6,7 @@ secret.py
 
 # Lambda dependencies
 dependencies
+dependencies.zip
 
 # pycache funsies
 __pycache__
