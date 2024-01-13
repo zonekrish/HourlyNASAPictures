@@ -1,2 +1,5 @@
-## Credentials
+# Credentials
 secret.py
+
+# pycache funsies
+__pycache__
