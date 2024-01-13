@@ -18,5 +18,8 @@ client = tweepy.Client(
     credentials["ACCESS_TOKEN_SECRET"]
 )
 
-# Create tweet
-client.create_tweet(text="I love space!")
+def tweet():
+    # Create tweet
+    client.create_tweet(text="...still love space")
+
+tweet()
