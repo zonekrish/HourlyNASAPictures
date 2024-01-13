@@ -3,35 +3,36 @@ import tweepy
 import requests
 import random
 import os
+import sys
 from bs4 import BeautifulSoup
 from secret import credentials
 
-# Remove image
-try:
-    os.remove("temp.jpg")
-except:
-    pass
-
-# Assign URL root to scrape
-url = "https://apod.nasa.gov/apod/"
-
-# Log into API
-auth = tweepy.OAuth1UserHandler(
-    credentials["API_KEY"],
-    credentials["API_KEY_SECRET"],
-    credentials["ACCESS_TOKEN"],
-    credentials["ACCESS_TOKEN_SECRET"]
-)
-api = tweepy.API(auth)
-client = tweepy.Client(
-    credentials["BEARER_TOKEN"],
-    credentials["API_KEY"],
-    credentials["API_KEY_SECRET"],
-    credentials["ACCESS_TOKEN"],
-    credentials["ACCESS_TOKEN_SECRET"]
-)
-
 def tweet():
+    # Remove image
+    try:
+        os.remove("temp.jpg")
+    except:
+        pass
+
+    # Assign URL root to scrape
+    url = "https://apod.nasa.gov/apod/"
+
+    # Log into API
+    auth = tweepy.OAuth1UserHandler(
+        credentials["API_KEY"],
+        credentials["API_KEY_SECRET"],
+        credentials["ACCESS_TOKEN"],
+        credentials["ACCESS_TOKEN_SECRET"]
+    )
+    api = tweepy.API(auth)
+    client = tweepy.Client(
+        credentials["BEARER_TOKEN"],
+        credentials["API_KEY"],
+        credentials["API_KEY_SECRET"],
+        credentials["ACCESS_TOKEN"],
+        credentials["ACCESS_TOKEN_SECRET"]
+    )
+    
     # Scrape main HTML page
     response = requests.get(url + "archivepixFull.html")
     soup1 = BeautifulSoup(response.text, "html.parser")
@@ -66,4 +67,15 @@ def tweet():
 
     post = client.create_tweet(media_ids=[img.media_id])
 
-tweet()
+
+if (len(sys.argv) > 0 and sys.argv[1] == "schedule"):
+    import schedule
+    import time
+
+    schedule.every().hour.at(":00").do(tweet)
+
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+else:
+    tweet()
