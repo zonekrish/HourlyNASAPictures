@@ -1,11 +1,19 @@
 # Import necessary dependencies
 import tweepy
 import requests
+import random
+import os
 from bs4 import BeautifulSoup
 from secret import credentials
 
-# Assign URL to scrape
-url = "https://apod.nasa.gov/apod/archivepixFull.html"
+# Remove image
+try:
+    os.remove("temp.jpg")
+except:
+    pass
+
+# Assign URL root to scrape
+url = "https://apod.nasa.gov/apod/"
 
 # Log into API
 auth = tweepy.OAuth1UserHandler(
@@ -24,19 +32,30 @@ client = tweepy.Client(
 )
 
 def tweet():
-    # Get HTML page
-    response = requests.get(url)
+    # Scrape main HTML page
+    response = requests.get(url + "archivepixFull.html")
+    soup1 = BeautifulSoup(response.text, "html.parser")
 
-    # Parse page
-    soup = BeautifulSoup(response.text, "html.parser")
+    # Get all elements w/ image link
+    elements = soup1.find_all("a")
 
-    # Get all elements w/ image
-    elements = soup.find_all("a")
+    # Get random number for posting image
+    rand = random.randint(0, len(elements)-1)
 
-    # Print all elements
-    for i in range(len(elements)):
-        print(elements[i])
+    # Scrape page with image link
+    imgResp = requests.get(url + elements[rand].get("href"))
+    soup2 = BeautifulSoup(imgResp.text, "html.parser")
 
+    # Get image page link
+    imgElem = soup2.find_all("a")
+    link = url + imgElem[1].get("href")
+
+    # Download image from link
+    imgData = requests.get(link).content
+
+    with open("temp.jpg", "wb") as f:
+        f.write(imgData)
+    
     # Create tweet
     # client.create_tweet(text="...still love space")
 
