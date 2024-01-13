@@ -66,5 +66,4 @@ def tweet():
 
     post = client.create_tweet(media_ids=[img.media_id])
 
-
 tweet()
