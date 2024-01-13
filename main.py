@@ -67,8 +67,15 @@ def tweet():
 
     post = client.create_tweet(media_ids=[img.media_id])
 
+# Check if user specified scheduled Tweets
+def checkArgs():
+    for i in range(len(sys.argv)):
+        if (sys.argv[i] == "schedule"):
+            return True
+    
+    return False
 
-if (len(sys.argv) > 0 and sys.argv[1] == "schedule"):
+if (checkArgs()):
     import schedule
     import time
 
