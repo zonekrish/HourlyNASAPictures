@@ -3,7 +3,6 @@ import tweepy
 import requests
 import random
 import os
-import sys
 from bs4 import BeautifulSoup
 from secret import credentials
 
