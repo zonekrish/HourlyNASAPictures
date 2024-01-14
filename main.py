@@ -4,12 +4,12 @@ import requests
 import random
 import os
 from bs4 import BeautifulSoup
-from secret import credentials
+from secret import credentials, filename
 
 def tweet():
     # Remove image
     try:
-        os.remove("/tmp/temp.jpg")
+        os.remove(filename)
     except:
         pass
 
@@ -53,7 +53,7 @@ def tweet():
     # Download image from link
     imgData = requests.get(link).content
 
-    with open("/tmp/temp.jpg", "wb") as f:
+    with open(filename, "wb") as f:
         f.write(imgData)
     
     # Set up image metadata
@@ -61,7 +61,7 @@ def tweet():
     print(metadata.strip())
 
     # Upload photo to Twitter
-    img = api.simple_upload("/tmp/temp.jpg")
+    img = api.simple_upload(filename)
     api.create_media_metadata(img.media_id, alt_text=metadata[7:])
 
     post = client.create_tweet(media_ids=[img.media_id])
