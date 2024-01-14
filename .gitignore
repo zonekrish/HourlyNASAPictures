@@ -1,6 +1,9 @@
 # Images
 *.jpg
 
+# Database
+db.json
+
 # Credentials
 secret.py
 
