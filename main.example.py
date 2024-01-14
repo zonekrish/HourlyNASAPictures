@@ -26,21 +26,27 @@ def getPicture():
 
     rand = random.randint(0, len(elements)-11)
 
-    alreadyPosted = True
-    while (alreadyPosted):
+    nopost = True
+    while (nopost):
         href = elements[rand].get("href")
 
         find = Query()
         if (len(db.search(find.href == href)) < 1):
-            alreadyPosted = False
+            nopost = False
         else:
             rand = random.randint(0, len(elements)-11)
+            continue
     
-    imgResp = requests.get(url + href)
-    soup2 = BeautifulSoup(imgResp.text, "html.parser")
+        imgResp = requests.get(url + href)
+        soup2 = BeautifulSoup(imgResp.text, "html.parser")
+        
+        imgElem = soup2.find_all("a")
 
-    imgElem = soup2.find_all("a")
-    link = url + imgElem[1].get("href")
+        if ("jpg" in imgElem[1].get("href")):
+            link = url + imgElem[1].get("href")
+        else:
+            rand = random.randint(0, len(elements)-11)
+            nopost = True
 
     imgData = requests.get(link).content
 

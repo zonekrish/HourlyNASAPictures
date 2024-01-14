@@ -46,24 +46,33 @@ def tweet():
     # Get random number for posting image
     rand = random.randint(0, len(elements)-11)
 
-    # Check if image has been posted
-    alreadyPosted = True
-    while (alreadyPosted):
+    # Check if image found will be good to post
+    nopost = True
+    while (nopost):
+        # Get href for image link
         href = elements[rand].get("href")
 
+        # Find it in database
         find = Query()
         if (len(db.search(find.href == href)) < 1):
-            alreadyPosted = False
+            nopost = False
         else:
             rand = random.randint(0, len(elements)-11)
+            continue
+        
+        # Scrape page with image link
+        imgResp = requests.get(url + href)
+        soup2 = BeautifulSoup(imgResp.text, "html.parser")
+        
+        # Get image page link
+        imgElem = soup2.find_all("a")
 
-    # Scrape page with image link
-    imgResp = requests.get(url + href)
-    soup2 = BeautifulSoup(imgResp.text, "html.parser")
-
-    # Get image page link
-    imgElem = soup2.find_all("a")
-    link = url + imgElem[1].get("href")
+        # Get new page if current page is not photo
+        if ("jpg" in imgElem[1].get("href")):
+            link = url + imgElem[1].get("href")
+        else:
+            rand = random.randint(0, len(elements)-11)
+            nopost = True
 
     # Download image from link
     imgData = requests.get(link).content
