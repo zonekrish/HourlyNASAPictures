@@ -4,6 +4,7 @@ import requests
 import random
 import os
 from bs4 import BeautifulSoup
+from tinydb import TinyDB, Query
 from secret import credentials, filename
 
 def tweet():
@@ -12,6 +13,9 @@ def tweet():
         os.remove(filename)
     except:
         pass
+
+    # Initialize database
+    db = TinyDB("db.json")
 
     # Assign URL root to scrape
     url = "https://apod.nasa.gov/apod/"
@@ -40,10 +44,21 @@ def tweet():
     elements = soup1.find_all("a")
 
     # Get random number for posting image
-    rand = random.randint(0, len(elements)-1)
+    rand = random.randint(0, len(elements)-11)
+
+    # Check if image has been posted
+    alreadyPosted = True
+    while (alreadyPosted):
+        href = elements[rand].get("href")
+
+        find = Query()
+        if (len(db.search(find.href == href)) < 1):
+            alreadyPosted = False
+        else:
+            rand = random.randint(0, len(elements)-11)
 
     # Scrape page with image link
-    imgResp = requests.get(url + elements[rand].get("href"))
+    imgResp = requests.get(url + href)
     soup2 = BeautifulSoup(imgResp.text, "html.parser")
 
     # Get image page link
@@ -52,18 +67,19 @@ def tweet():
 
     # Download image from link
     imgData = requests.get(link).content
-
     with open(filename, "wb") as f:
         f.write(imgData)
     
     # Set up image metadata
-    metadata = soup2.title.string
-    print(metadata.strip())
+    metadata = soup2.title.string.strip()
+    print(metadata)
 
     # Upload photo to Twitter
     img = api.simple_upload(filename)
-    api.create_media_metadata(img.media_id, alt_text=metadata[7:])
-
+    api.create_media_metadata(img.media_id, alt_text=metadata[6:])
     post = client.create_tweet(media_ids=[img.media_id])
+
+    # Insert image info. into databse
+    db.insert({"href": href, "alt": metadata})
 
 tweet()

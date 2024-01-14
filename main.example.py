@@ -24,10 +24,18 @@ def getPicture():
 
     elements = soup1.find_all("a")
 
-    rand = random.randint(0, len(elements)-1)
+    rand = random.randint(0, len(elements)-11)
 
-    href = elements[rand].get("href")
+    alreadyPosted = True
+    while (alreadyPosted):
+        href = elements[rand].get("href")
 
+        find = Query()
+        if (len(db.search(find.href == href)) < 1):
+            alreadyPosted = False
+        else:
+            rand = random.randint(0, len(elements)-11)
+    
     imgResp = requests.get(url + href)
     soup2 = BeautifulSoup(imgResp.text, "html.parser")
 
@@ -39,8 +47,8 @@ def getPicture():
     with open(filename, "wb") as f:
         f.write(imgData)
     
-    metadata = soup2.title.string
-    print(metadata.strip())
+    metadata = soup2.title.string.strip()
+    print(metadata)
 
     db.insert({"href": href, "alt": metadata})
 
