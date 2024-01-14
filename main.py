@@ -65,3 +65,5 @@ def tweet():
     api.create_media_metadata(img.media_id, alt_text=metadata[7:])
 
     post = client.create_tweet(media_ids=[img.media_id])
+
+tweet()
